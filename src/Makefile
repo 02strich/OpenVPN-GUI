@@ -48,10 +48,10 @@ WARNS = -W -Wall -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wbad-function-c
         -Wno-unused-function -Wno-unused-variable 
 
 CFLAGS = -Zi -O2 -DDISABLE_CHANGE_PASSWORD -nologo
-LDFLAGS = $(LIB_DIRS) /NOLOGO /INCREMENTAL /ALLOWISOLATION /MANIFESTUAC:"level=requireAdministrator uiAccess=false" /SUBSYSTEM:WINDOWS /DYNAMICBASE /NXCOMPAT /MACHINE:X86 /ERRORREPORT:QUEUE 
+LDFLAGS = $(LIB_DIRS) /NOLOGO /INCREMENTAL /ALLOWISOLATION /SUBSYSTEM:WINDOWS /DYNAMICBASE /NXCOMPAT /MACHINE:X86 /ERRORREPORT:QUEUE 
 
 all : $(OBJS)
 	$(CC) /Fe$(EXE) $(OBJS) /link $(LDFLAGS)
 
 clean :
-	del -f *.obj *.exe *.res
+	del -f *.obj *.exe *.res *.ilk

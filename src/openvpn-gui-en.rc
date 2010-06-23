@@ -23,10 +23,11 @@
 #include <windows.h>
 
 /* Application Icons */
-APP_ICON               ICON  DISCARDABLE  "openvpn-gui.ico"
-APP_ICON_CONNECTED     ICON  DISCARDABLE  "connected.ico"
-APP_ICON_CONNECTING    ICON  DISCARDABLE  "connecting.ico"
-APP_ICON_DISCONNECTED  ICON  DISCARDABLE  "disconnected.ico"
+APP_ICON				ICON  DISCARDABLE  "openvpn-gui.ico"
+APP_ICON_CONNECTED		ICON  DISCARDABLE  "connected.ico"
+APP_ICON_CONNECTING	ICON  DISCARDABLE  "connecting.ico"
+APP_ICON_DISCONNECTED	ICON  DISCARDABLE  "disconnected.ico"
+1			RT_MANIFEST "application.manifest"
 
 /* About Dialog - designed with lcc-win32 resource editor */
 IDD_ABOUTDIALOG DIALOG 0, 0, 260, 135
