@@ -608,7 +608,7 @@ int VerifyAutoConnections()
       match = false;
       for (j=0; j < MAX_CONFIGS; j++)
         {
-          if (strcasecmp(o.cnn[j].config_file, o.auto_connect[i]) == 0)
+          if (stricmp(o.cnn[j].config_file, o.auto_connect[i]) == 0)
             {
               match=true;
               break;

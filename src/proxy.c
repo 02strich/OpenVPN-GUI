@@ -35,7 +35,7 @@ void ShowProxySettingsDialog()
   DialogBox(o.hInstance, (LPCTSTR)IDD_PROXY, NULL, (DLGPROC)ProxySettingsDialogFunc);
 }
 
-BOOL CALLBACK ProxySettingsDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, UNUSED LPARAM lParam)
+BOOL CALLBACK ProxySettingsDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   HICON hIcon;
 
@@ -435,7 +435,7 @@ void GetProxyRegistrySettings()
   return;  
 }
 
-BOOL CALLBACK ProxyAuthDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, UNUSED LPARAM lParam)
+BOOL CALLBACK ProxyAuthDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   char username[50];
   char password[50];

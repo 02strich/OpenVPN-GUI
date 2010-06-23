@@ -52,9 +52,9 @@ char szTitleText[ ] = "OpenVPN";
 struct options o;
 
 int WINAPI WinMain (HINSTANCE hThisInstance,
-                    UNUSED HINSTANCE hPrevInstance,
+                    HINSTANCE hPrevInstance,
                     LPSTR lpszArgument,
-                    UNUSED int nCmdShow)
+                    int nCmdShow)
 {
   HWND hwnd;               /* This is the handle for our window */
   MSG messages;            /* Here messages to the application are saved */
@@ -319,7 +319,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 }
 
 
-BOOL CALLBACK AboutDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, UNUSED LPARAM lParam)
+BOOL CALLBACK AboutDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   HICON hIcon;
   TCHAR buf[1000];

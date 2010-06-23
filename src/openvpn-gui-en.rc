@@ -39,11 +39,7 @@ BEGIN
     LTEXT           "", ID_TEXT_OPENVPNGUI, 40, 5, 215, 8
     LTEXT           "Copyright (C) 2004-2005 Mathias Sundman <info@openvpn.se>", 102, 40, 15, 215, 8
     LTEXT           "http://openvpn.se/", 103, 40, 25, 215, 8
-    LTEXT           "OpenVPN - An application to securely tunnel IP networks " \
-                    "over a single UDP port, with support for SSL/TLS-based " \
-                    "session authentication and key exchange, packet " \
-                    "encryption, packet authentication, and packet compression.", 
-                    104, 11, 51, 235, 34
+    LTEXT           "OpenVPN - An application to securely tunnel IP networks over a single UDP port, with support for SSL/TLS-based session authentication and key exchange, packet encryption, packet authentication, and packet compression.",  104, 11, 51, 235, 34
     LTEXT           "Copyright (C) 2002-2005 OpenVPN Solutions LLC <info@openvpn.net>", 105, 11, 87, 235, 11
     LTEXT           "http://openvpn.net/", 106, 11, 98, 235, 10
 END
@@ -113,10 +109,8 @@ CAPTION "OpenVPN - Proxy Settings"
 FONT 8, "MS Sans Serif"
 BEGIN
     GROUPBOX        "", 201, 13, 62, 243, 137
-    AUTORADIOBUTTON "Use OpenVPN Config-file Settings", RB_PROXY_USE_OPENVPN, \
-                    20, 12, 200, 10, WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Use Internet Explorer Settings (manually configured)", \
-                    RB_PROXY_USE_IE, 20, 31, 200, 10
+    AUTORADIOBUTTON "Use OpenVPN Config-file Settings", RB_PROXY_USE_OPENVPN, 20, 12, 200, 10, WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Use Internet Explorer Settings (manually configured)", RB_PROXY_USE_IE, 20, 31, 200, 10
     AUTORADIOBUTTON "Manual Configuration", RB_PROXY_USE_MANUAL, 20, 50, 200, 10
     AUTORADIOBUTTON "HTTP Proxy", RB_PROXY_HTTP, 20, 74, 59, 10, WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "SOCKS Proxy", RB_PROXY_SOCKS, 20, 147, 67, 10
@@ -231,9 +225,8 @@ BEGIN
   ERR_GET_EXIT_CODE         "Failed to get ExitCode of Connect Script (%s)"
   ERR_CONN_SCRIPT_FAILED    "Connect Script failed. (exitcode=%ld)"
   ERR_RUN_CONN_SCRIPT_TIMEOUT "Connect Script failed. TimeOut after %d sec."
-  ERR_CONFIG_ALREADY_EXIST  "There already exist a config file named '%s'. You cannot " \
-                            "have multiple config files with the same name, even if " \
-                            "they reside in diffrent folders."
+  ERR_CONFIG_ALREADY_EXIST  "There already exist a config file named '%s'. You cannot have multiple config files with the same name, even if they reside in diffrent folders."
+  
   /* main - Resources */
   ERR_OPEN_DEBUG_FILE       "Error opening debug file (%s) for output."
   ERR_LOAD_RICHED20         "Could not load RICHED20.DLL."
@@ -241,50 +234,40 @@ BEGIN
   ERR_GUI_ALREADY_RUNNING   "OpenVPN GUI is already running."
   INFO_SERVICE_STARTED      "OpenVPN Service started."
   INFO_SERVICE_STOPPED      "OpenVPN Service stopped."
-  INFO_ACTIVE_CONN_EXIT     "There are still active connections that will be closed if you exit OpenVPN GUI." \
-                            "\n\nAre you sure you want to exit?"
-  INFO_SERVICE_ACTIVE_EXIT  "You are currently connected (the OpenVPN Service is running). " \
-                            "You will stay connected even if you exit OpenVPN GUI.\n\n" \
-                            "Do you want to proceed and exit OpenVPN GUI?"
-  ERR_OPTION_LOG_IN_CONFIG  "You have ""log"" or ""log-append"" in your OpenVPN config file. These options " \
-                            "should not be used with OpenVPN GUI as they prevents OpenVPN GUI from reading " \
-                            "the log output of OpenVPN which is necessary for correct operation of OpenVPN " \
-                            "GUI. The log is always written to a logfile when OpenVPN GUI is beeing used " \
-                            "anyway, so you should remove this option.\n\nDo you want to proceed connecting " \
-                            "anyway?"
+  INFO_ACTIVE_CONN_EXIT     "There are still active connections that will be closed if you exit OpenVPN GUI.\n\nAre you sure you want to exit?"
+  INFO_SERVICE_ACTIVE_EXIT  "You are currently connected (the OpenVPN Service is running). You will stay connected even if you exit OpenVPN GUI.\n\nDo you want to proceed and exit OpenVPN GUI?"
+  ERR_OPTION_LOG_IN_CONFIG  "You have ""log"" or ""log-append"" in your OpenVPN config file. These options should not be used with OpenVPN GUI as they prevents OpenVPN GUI from reading the log output of OpenVPN which is necessary for correct operation of OpenVPN GUI. The log is always written to a logfile when OpenVPN GUI is beeing used anyway, so you should remove this option.\n\nDo you want to proceed connecting anyway?"
 
   /* options - Resources */
-  INFO_USAGE	    "--help\t\t\t: Show this message.\n" \
-		    "--connect cnn \t\t: Connect to ""cnn"" at startup. (extension must be included)\n" \
-		    "\t\t\t   Example: openvpn-gui --connect office.ovpn\n" \
-		    "\n" \
-		    "Options to override registry settings:\n" \
-		    "--exe_path\t\t: Path to openvpn.exe.\n" \
-		    "--config_dir\t\t: Path to dir to search for config files in.\n" \
-		    "--ext_string\t\t: Extension on config files.\n" \
-		    "--log_dir\t\t\t: Path to dir where log files will be saved.\n" \
-		    "--priority_string\t\t: Priority string (See install.txt for more info).\n" \
-		    "--append_string\t\t: 1=Append to log file. 0=Truncate logfile when connecting.\n" \
-		    "--log_viewer\t\t: Path to log viewer.\n" \
-		    "--editor\t\t\t: Path to config editor.\n" \
-		    "--allow_edit\t\t: 1=Show Edit Config menu item.\n" \
-		    "--allow_service\t\t: 1=Show Service control menu.\n" \
-		    "--allow_password\t\t: 1=Show Change Password menu item.\n" \
-		    "--allow_proxy\t\t: 1=Show Proxy Settings menu.\n" \
-		    "--show_balloon\t\t: 0=Never, 1=At initial connect, 2=At every re-connect.\n" \
-		    "--service_only\t\t: 1=Enable Service Only mode.\n" \
-		    "--silent_connection\t\t: 1=Do not show the status dialog while connecting.\n" \
-		    "--show_script_window\t: 0=Hide Script execution window, 1=Show it.\n" \
-		    "--passphrase_attempts\t: Number of passphrase attempts to allow.\n" \
-		    "--connectscript_timeout\t: Time to wait for connect script to finish.\n" \
-		    "--disconnectscript_timeout\t: Time to wait for disconnect script to finish.\n" \
-		    "--preconnectscript_timeout\t: Time to wait for preconnect script to finish.\n"
+  INFO_USAGE	    "--help\t\t\t: Show this message.\n \
+		    --connect cnn \t\t: Connect to ""cnn"" at startup. (extension must be included)\n \
+		    \t\t\t   Example: openvpn-gui --connect office.ovpn\n \
+		    \n \
+		    Options to override registry settings:\n \
+		    --exe_path\t\t: Path to openvpn.exe.\n \
+		    --config_dir\t\t: Path to dir to search for config files in.\n \
+		    --ext_string\t\t: Extension on config files.\n \
+		    --log_dir\t\t\t: Path to dir where log files will be saved.\n \
+		    --priority_string\t\t: Priority string (See install.txt for more info).\n \
+		    --append_string\t\t: 1=Append to log file. 0=Truncate logfile when connecting.\n \
+		    --log_viewer\t\t: Path to log viewer.\n \
+		    --editor\t\t\t: Path to config editor.\n \
+		    --allow_edit\t\t: 1=Show Edit Config menu item.\n \
+		    --allow_service\t\t: 1=Show Service control menu.\n \
+		    --allow_password\t\t: 1=Show Change Password menu item.\n \
+		    --allow_proxy\t\t: 1=Show Proxy Settings menu.\n \
+		    --show_balloon\t\t: 0=Never, 1=At initial connect, 2=At every re-connect.\n \
+		    --service_only\t\t: 1=Enable Service Only mode.\n \
+		    --silent_connection\t\t: 1=Do not show the status dialog while connecting.\n \
+		    --show_script_window\t: 0=Hide Script execution window, 1=Show it.\n \
+		    --passphrase_attempts\t: Number of passphrase attempts to allow.\n \
+		    --connectscript_timeout\t: Time to wait for connect script to finish.\n \
+		    --disconnectscript_timeout\t: Time to wait for disconnect script to finish.\n \
+		    --preconnectscript_timeout\t: Time to wait for preconnect script to finish.\n"
   
   INFO_USAGECAPTION         "OpenVPN GUI Usage"
-  ERR_BAD_PARAMETER         "I'm trying to parse ""%s"" as an --option parameter " \
-                            "but I don't see a leading '--'"
-  ERR_BAD_OPTION	    "Options error: Unrecognized option or missing parameter(s): --%s\n" \
-                            "Use openvpn-gui --help for more info."
+  ERR_BAD_PARAMETER         "I'm trying to parse ""%s"" as an --option parameter but I don't see a leading '--'"
+  ERR_BAD_OPTION	    "Options error: Unrecognized option or missing parameter(s): --%s\nUse openvpn-gui --help for more info."
 
   /* passphrase - Resources */
   ERR_CREATE_PASS_THREAD    "CreateThread to show ChangePassphrase dialog failed."
@@ -310,8 +293,8 @@ BEGIN
   ERR_AUTH_USERNAME2STDIN   "Error passing auth username to stdin."
   ERR_AUTH_PASSWORD2STDIN   "Error passing auth password to stdin."
   ERR_CR2STDIN              "Error passing CR to stdin."
-  ERR_INVALID_CHARS_IN_PSW  "Your new password contains non-valid characters. " \
-                            "Please choose another one."
+  ERR_INVALID_CHARS_IN_PSW  "Your new password contains non-valid characters. Please choose another one."
+  
   /* proxy */
   ERR_HTTP_PROXY_ADDRESS    "You must specify a HTTP proxy address."
   ERR_HTTP_PROXY_PORT       "You must specify a HTTP proxy port."
@@ -336,16 +319,14 @@ BEGIN
   /* registry */
   ERR_GET_WINDOWS_DIR       "Error getting Windows Directory."
   ERR_GET_PROGRAM_DIR       "Error getting ""Program"" folder name."
-  ERR_OPEN_REGISTRY         "Error opening registry for reading (HKLM\\SOFTWARE\\OpenVPN).\n " \
-			    "OpenVPN is probably not installed"
+  ERR_OPEN_REGISTRY         "Error opening registry for reading (HKLM\\SOFTWARE\\OpenVPN).\n OpenVPN is probably not installed"
   ERR_READING_REGISTRY      "Error reading registry value (HKLM\\SOFTWARE\\OpenVPN)."
   ERR_PASSPHRASE_ATTEMPTS   "Registry value ""passphrase_attempts"" must be a number between 1 and 9."
   ERR_CONN_SCRIPT_TIMEOUT   "Registry value ""connectscript_timeout"" must be a number between 0 and 99."
   ERR_DISCONN_SCRIPT_TIMEOUT "Registry value ""disconnectscript_timeout"" must be a number between 1 and 99."
   ERR_PRECONN_SCRIPT_TIMEOUT "Registry value ""preconnectscript_timeout"" must be a number between 1 and 99."
   ERR_CREATE_REG_KEY        "Error creating HKLM\\SOFTWARE\\OpenVPN-GUI key."
-  ERR_OPEN_WRITE_REG        "Failed to open the registry for writing. You need to run this application " \
-			    "once as Administrator to update the registry."
+  ERR_OPEN_WRITE_REG        "Failed to open the registry for writing. You need to run this application once as Administrator to update the registry."
   ERR_READ_SET_KEY          "Error reading and setting registry key ""%s""." 
   ERR_WRITE_REGVALUE	    "Error writing registry value ""HKEY_CURRENT_USER\\%s\\%s""."
 END

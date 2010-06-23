@@ -220,7 +220,7 @@ void CheckAuthPasswordPrompt (char *line)
     }
 }
 
-BOOL CALLBACK PassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, UNUSED LPARAM lParam)
+BOOL CALLBACK PassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   static char empty_string[100];
 

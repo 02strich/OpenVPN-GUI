@@ -47,6 +47,8 @@ int Createargcargv(struct options* options, char* command_line)
     int    result;
 
     int	i;
+	
+    char filename[_MAX_PATH];
     // count the arguments
 
     argc = 1;
@@ -123,8 +125,6 @@ int Createargcargv(struct options* options, char* command_line)
     }    
 
     // put the program name into argv[0]
-    char filename[_MAX_PATH];
-
     GetModuleFileName(NULL, filename, _MAX_PATH);
     argv[0] = filename;
 
@@ -177,6 +177,7 @@ add_option (struct options *options,
 	    int i,
 	    char *p[])
 {
+	static int auto_connect_nr;
 
   if (streq (p[0], "help"))
     {
@@ -191,7 +192,7 @@ add_option (struct options *options,
   else if (streq (p[0], "connect") && p[1])
     {
       ++i;
-      static int auto_connect_nr=0;
+      auto_connect_nr=0;
       if (auto_connect_nr == MAX_CONFIGS)
         {
           /* Too many configs */

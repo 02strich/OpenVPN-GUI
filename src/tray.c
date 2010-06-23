@@ -31,6 +31,7 @@
 
 #include <windows.h>
 #include <time.h>
+
 #include "tray.h"
 #include "service.h"
 #include "shellapi.h"

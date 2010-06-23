@@ -37,19 +37,14 @@
 /* Registry key for Global Settings */
 #define GUI_REGKEY_HKLM	"SOFTWARE\\OpenVPN-GUI"
 
+/* Configuration for LogWindow */
 #define MAX_LOG_LINES		500	/* Max number of lines in LogWindow */
 #define DEL_LOG_LINES		10	/* Number of lines to delete from LogWindow */
-
-
 
 /* bool definitions */
 #define bool int
 #define true 1
 #define false 0
-
-/* GCC function attributes */
-#define UNUSED __attribute__ ((unused))
-#define NORETURN __attribute__ ((noreturn))
 
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
 struct security_attributes
@@ -58,32 +53,30 @@ struct security_attributes
   SECURITY_DESCRIPTOR sd;
 };
 
-
 /* clear an object */
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
 /* snprintf with guaranteed null termination */
-#define mysnprintf(out, args...) \
+#define mysnprintf(out, ...) \
         { \
-           snprintf (out, sizeof(out), args); \
+           _snprintf(out, sizeof(out), __VA_ARGS__); \
            out [sizeof (out) - 1] = '\0'; \
         }
 
-
 /* Show Message */
-#define ShowMsg(caption, args...) \
+#define ShowMsg(caption, ...) \
         { \
            char x_msg[256]; \
-           mysnprintf (x_msg, args); \
+           mysnprintf (x_msg, __VA_ARGS__); \
 	   MessageBox(NULL, x_msg, caption, MB_OK | MB_SETFOREGROUND); \
         }
 
-#define ShowLocalizedMsg(caption, id, args...) \
+#define ShowLocalizedMsg(caption, id, ...) \
 	{ \
 	   char x_msg[256]; \
 	   TCHAR x_buf[1000]; \
 	   LoadString(o.hInstance, id, x_buf, sizeof(x_buf)/sizeof(TCHAR)); \
-	   mysnprintf(x_msg, x_buf, args); \
+	   mysnprintf(x_msg, x_buf, __VA_ARGS__); \
 	   MessageBox(NULL, x_msg, caption, MB_OK | MB_SETFOREGROUND); \
 	}
 #define myLoadString(id) \
@@ -93,10 +86,10 @@ struct security_attributes
 
 #ifdef DEBUG
 /* Print Debug Message */
-#define PrintDebug(args...) \
+#define PrintDebug(...) \
         { \
            char x_msg[256]; \
-           mysnprintf (x_msg, args); \
+           mysnprintf (x_msg, __VA_ARGS__); \
 	   PrintDebugMsg(x_msg); \
         }
 

@@ -36,4 +36,4 @@ int CheckVersion();
 int CountConnectedState(int CheckVal);
 void CheckAndSetTrayIcon();
 void SetStatusWinIcon(HWND hwndDlg, int IconID);
-void ThreadOpenVPNStatus(int status) __attribute__ ((noreturn));
+void ThreadOpenVPNStatus(int status);

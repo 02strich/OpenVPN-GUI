@@ -46,7 +46,7 @@ match (const WIN32_FIND_DATA *find, const char *ext)
   if (i < 1)
     return MATCH_FALSE;
 
-  if (find->cFileName[i] == '.' && !strcasecmp (find->cFileName + i + 1, ext))
+  if (find->cFileName[i] == '.' && !stricmp (find->cFileName + i + 1, ext))
     return MATCH_FILE;
   else
     return MATCH_FALSE;
@@ -92,7 +92,7 @@ int ConfigAlreadyExists(char newconfig[])
 
   for (i=0; i<o.num_configs; i++)
     {
-      if (strcasecmp(o.cnn[i].config_file, newconfig) == 0)
+      if (stricmp(o.cnn[i].config_file, newconfig) == 0)
         return true;
     }
 
@@ -128,7 +128,7 @@ int AddConfigFileToList(int config, char filename[], char config_dir[])
   /* Check if connection should be autostarted */
   for (i=0; (i < MAX_CONFIGS) && o.auto_connect[i]; i++)
     {
-      if (strcasecmp(o.cnn[config].config_file, o.auto_connect[i]) == 0)
+      if (stricmp(o.cnn[config].config_file, o.auto_connect[i]) == 0)
         {
           o.cnn[config].auto_connect = true;
           break;
