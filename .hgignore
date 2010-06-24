@@ -1,2 +1,6 @@
 glob:src/*.pdb
 glob:src/*.ilk
+glob:installer/openvpn-*-install.exe
+glob:src/*.obj
+glob:src/*.res
+glob:src/*.exe
