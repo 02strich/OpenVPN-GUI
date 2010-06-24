@@ -395,6 +395,7 @@ SectionEnd
 
 Section "Add Shortcuts to Start Menu" SecAddShortcuts
   SetOverwrite on
+  SetShellVarContext all
   
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}\Documentation"
@@ -520,6 +521,7 @@ Section -post
     WriteRegStr HKCR "${PRODUCT_NAME}File\shell\run\command" "" '"$INSTDIR\bin\${PRODUCT_UNIX_NAME}.exe" --pause-exit --config "%1"'
 
   ; Create start menu folders
+  SetShellVarContext all
  noass:
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}\Utilities"
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}\Shortcuts"
@@ -527,7 +529,7 @@ Section -post
   ; Create start menu and desktop shortcuts to OpenVPN GUI
   IfFileExists "$INSTDIR\bin\${OPENVPN_GUI}" "" tryaddtap
     CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME} GUI.lnk" "$INSTDIR\bin\${OPENVPN_GUI}" ""
-    CreateShortcut "$DESKTOP\${PRODUCT_NAME} GUI.lnk" "$INSTDIR\bin\${OPENVPN_GUI}"
+    CreateShortCut "$DESKTOP\${PRODUCT_NAME} GUI.lnk" "$INSTDIR\bin\${OPENVPN_GUI}"
  
     ; Create start menu shortcuts to addtap.bat and deltapall.bat
  tryaddtap:
@@ -576,12 +578,7 @@ SectionEnd
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecOpenVPNUserSpace} $(DESC_SecOpenVPNUserSpace)
-  !ifdef USE_GUI
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecOpenVPNGUI} $(DESC_SecOpenVPNGUI)
-  !endif
-  !ifdef USE_XGUI
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecOpenVPNXGUI} $(DESC_SecOpenVPNXGUI)
-  !endif
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecOpenVPNGUI} $(DESC_SecOpenVPNGUI)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecOpenVPNEasyRSA} $(DESC_SecOpenVPNEasyRSA)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecTAP} $(DESC_SecTAP)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecOpenSSLUtilities} $(DESC_SecOpenSSLUtilities)
@@ -626,8 +623,9 @@ Section "Uninstall"
   Push "$INSTDIR\bin"
   Call un.RemoveFromPath
 
-  RMDir /r $SMPROGRAMS\${PRODUCT_NAME}
-
+  SetShellVarContext all
+  RMDir /r "$SMPROGRAMS\${PRODUCT_NAME}"
+	
   Delete "$INSTDIR\bin\${OPENVPN_GUI}"
   Delete "$DESKTOP\${PRODUCT_NAME} GUI.lnk"
 
