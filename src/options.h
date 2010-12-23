@@ -112,6 +112,7 @@ struct options
   char connectscript_timeout_string[4];
   char disconnectscript_timeout_string[4];
   char preconnectscript_timeout_string[4];
+  char credentials_prefix_string[15]; /* Prefix for credentials targetname */
 
   /* Proxy Settings */
   int proxy_source;			/* 0=OpenVPN config, 1=IE, 2=Manual */

@@ -26,6 +26,7 @@
 #include "openvpn.h"
 #include "openvpn-gui-res.h"
 #include "chartable.h"
+#include "credentials.h"
 
 #ifndef DISABLE_CHANGE_PASSWORD
 #include <openssl/pem.h>
@@ -151,10 +152,26 @@ void CheckAuthUsernamePrompt (char *line, int config)
   DWORD nCharsWritten;
   struct user_auth user_auth;
 
+#pragma message ("Insert Password Save here")
+
   /* Check for Passphrase prompt */
   if (strncmp(line, "Enter Auth Username:", 20) == 0) 
     {
-      CLEAR(user_auth);  
+      CLEAR(user_auth);
+	  if (OPENVPN_ERROR_NOT_FOUND == ReadCredentials(o.cnn[config].config_name,&user_auth))
+	  {
+		  if (DialogBoxParam(o.hInstance, 
+                         (LPCTSTR)IDD_CRED_PASSWORD,
+                         NULL,
+                         (DLGPROC)CredPasswordDialogFunc,
+                         (LPARAM)&user_auth) == IDCANCEL)
+		  {
+			StopOpenVPN(config);
+		  }
+	  }
+
+#undef BLUB
+#ifdef BLUB
       if (DialogBoxParam(o.hInstance, 
                          (LPCTSTR)IDD_AUTH_PASSWORD,
                          NULL,
@@ -163,7 +180,7 @@ void CheckAuthUsernamePrompt (char *line, int config)
         {
           StopOpenVPN(config);
         }
-
+#endif
       if (strlen(user_auth.username) > 0)
         {
           if (!WriteFile(o.cnn[config].hStdIn, user_auth.username,
@@ -197,6 +214,8 @@ void CheckAuthUsernamePrompt (char *line, int config)
               ShowLocalizedMsg(GUI_NAME, ERR_CR2STDIN, "");
             }
         }
+	  
+	  SaveCredentials(o.cnn[config].config_name, o.credentials_prefix_string, user_auth);
 
       /* Remove Username prompt from lastline buffer */
       line[0]='\0';
@@ -254,6 +273,60 @@ BOOL CALLBACK PassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARA
   }
   return FALSE;
 }
+
+BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  static struct user_auth *user_auth;
+  static char empty_string[100];
+  WCHAR username_unicode[50];
+  WCHAR password_unicode[50];
+  unsigned char savecred=0;
+
+  switch (msg) {
+
+    case WM_INITDIALOG:
+      user_auth = (struct user_auth *) lParam;
+      SetForegroundWindow(hwndDlg);
+      break;
+
+    case WM_COMMAND:
+      switch (LOWORD(wParam)) {
+
+        case IDOK:			// button
+          GetDlgItemTextW(hwndDlg, EDIT_CRED_USERNAME, username_unicode, sizeof(username_unicode)/2 - 1);
+          GetDlgItemTextW(hwndDlg, EDIT_CRED_PASSWORD, password_unicode, sizeof(password_unicode)/2 - 1);
+
+		  savecred = IsDlgButtonChecked(hwndDlg,IDC_CRED_SAVECREDENTIALS); //save password
+		  
+		  if(savecred)
+			  MessageBox(NULL,"Checked","",IDOK);
+
+
+
+          /* Convert username/password from Unicode to Ascii (CP850) */
+          ConvertUnicode2Ascii(username_unicode, user_auth->username, sizeof(user_auth->username) - 1);
+          ConvertUnicode2Ascii(password_unicode, user_auth->password, sizeof(user_auth->password) - 1);
+
+          /* Clear buffers */
+          SetDlgItemText(hwndDlg, EDIT_CRED_USERNAME, empty_string);
+          SetDlgItemText(hwndDlg, EDIT_CRED_PASSWORD, empty_string);
+
+          EndDialog(hwndDlg, LOWORD(wParam));
+          return TRUE;
+
+        case IDCANCEL:			// button
+          EndDialog(hwndDlg, LOWORD(wParam));
+          return TRUE;
+      }
+      break;
+    case WM_CLOSE:
+      EndDialog(hwndDlg, LOWORD(wParam));
+      return TRUE;
+     
+  }
+  return FALSE;
+}
+
 
 BOOL CALLBACK AuthPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {

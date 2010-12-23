@@ -21,7 +21,8 @@ HEADERS = main.h \
 	registry.h \
 	openvpn_config.h \
 	chartable.h \
-	scripts.h
+	scripts.h \
+	credentials.h
 
 OBJS = main.obj \
 	tray.obj \
@@ -36,6 +37,7 @@ OBJS = main.obj \
 	registry.obj \
         openvpn_config.obj \
 	scripts.obj \
+	credentials.obj \
 	openvpn-gui-$(RES_LANG).res
 
 INCLUDE_DIRS = -I. 

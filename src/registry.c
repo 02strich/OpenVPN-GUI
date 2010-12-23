@@ -37,6 +37,7 @@ GetRegistryKeys()
   char temp_path[MAX_PATH];
   char openvpn_path[MAX_PATH];
   HKEY regkey;
+  HKEY hkcu_regkey;
 
   if (!GetWindowsDirectory(windows_dir, sizeof(windows_dir))) {
     /* can't get windows dir */
@@ -44,14 +45,25 @@ GetRegistryKeys()
     return(false);
   }
 
-  /* Get path to OpenVPN installation. */
-  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\OpenVPN", 0, KEY_READ, &regkey)
+  /* Try Current User's OpenVPN settings first */
+  if (RegOpenKeyEx(HKEY_CURRENT_USER, OPENVPN_REGKEY, 0, KEY_READ, &regkey)
       != ERROR_SUCCESS) 
     {
       /* registry key not found */
       ShowLocalizedMsg(GUI_NAME, ERR_OPEN_REGISTRY, "");
-      return(false);
+     
     }
+
+
+  /* Get path to HKLM OpenVPN installation. */
+  //if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, OPENVPN_REGKEY_HKLM, 0, KEY_READ, &regkey)
+   //   != ERROR_SUCCESS) 
+    //{
+      /* registry key not found */
+      //ShowLocalizedMsg(GUI_NAME, ERR_OPEN_REGISTRY, "");
+      //return(false);
+    //}
+
   if (!GetRegistryValue(regkey, "", openvpn_path, sizeof(openvpn_path)))
     {
       /* error reading registry value */
@@ -147,6 +159,9 @@ GetRegistryKeys()
       ShowLocalizedMsg(GUI_NAME, ERR_PRECONN_SCRIPT_TIMEOUT, "");
       return(false);
     }
+  if (!GetRegKey("credentials_prefix", o.credentials_prefix_string, "OpenVPN", 
+      sizeof(o.credentials_prefix_string))) return(false);
+  //credentials_prefix[15]
 
   return(true);
 }
@@ -175,7 +190,7 @@ int GetRegKey(const char name[], char *data, const char default_data[], DWORD le
     }
 
   status = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                       "SOFTWARE\\OpenVPN-GUI",
+                       OPENVPNGUI_REGKEY,
                        0,
                        KEY_READ,
                        &openvpn_key);
@@ -183,7 +198,7 @@ int GetRegKey(const char name[], char *data, const char default_data[], DWORD le
   if (status != ERROR_SUCCESS)
     {
       if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-                        "Software\\OpenVPN-GUI",
+                        OPENVPNGUI_REGKEY,
                         0,
                         (LPTSTR) "",
                         REG_OPTION_NON_VOLATILE,
@@ -205,7 +220,7 @@ int GetRegKey(const char name[], char *data, const char default_data[], DWORD le
     {
       /* key did not exist - set default value */
       status = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-			  "SOFTWARE\\OpenVPN-GUI",
+			  OPENVPNGUI_REGKEY,
 			  0,
 			  KEY_READ | KEY_WRITE,
 			  &openvpn_key_write);

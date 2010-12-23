@@ -18,6 +18,8 @@
  *  distribution); if not, write to the Free Software Foundation, Inc.,
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#ifndef __PASSPHRASE_H
+#define __PASSPHRASE_H
 
 #define MIN_PASSWORD_LEN	8
 
@@ -31,6 +33,7 @@ void CheckAuthUsernamePrompt (char *line, int config);
 void CheckAuthPasswordPrompt (char *line);
 BOOL CALLBACK PassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK AuthPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void ShowChangePassphraseDialog(int config);
 BOOL CALLBACK ChangePassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -41,3 +44,4 @@ int ChangePasswordPEM(HWND hwndDlg);
 int ChangePasswordPKCS12(HWND hwndDlg);
 int GetKeyFilename(int config, char *keyfilename, unsigned int keyfilenamesize, int *keyfile_format);
 
+#endif

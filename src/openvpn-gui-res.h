@@ -28,7 +28,7 @@
 /* About Dialog */
 #define	IDD_ABOUTDIALOG			100
 #define	ID_TEXT_OPENVPNGUI		101
-#define TEXT_ABOUT_OPENVPNGUI		102
+#define TEXT_ABOUT_OPENVPNGUI	102
 
 /* Ask for Passphrase Dialog */
 #define	IDD_PASSPHRASE			150
@@ -38,7 +38,7 @@
 #define	IDD_STATUS			160
 #define	TEXT_STATUS			161
 #define	EDIT_LOG			162
-#define	ID_DISCONNECT			163
+#define	ID_DISCONNECT		163
 #define	ID_RESTART 			164
 #define	ID_HIDE				165
 /* A hidden textbox used to pass the config nr so dialog knows 
@@ -59,6 +59,12 @@
 #define	IDD_AUTH_PASSWORD		180
 #define	EDIT_AUTH_USERNAME		181
 #define	EDIT_AUTH_PASSWORD		182
+/* Cred Auth Username/Password Dialog */
+#define	IDD_CRED_PASSWORD		190
+#define	EDIT_CRED_USERNAME		191
+#define	EDIT_CRED_PASSWORD		192
+#define IDC_CRED_SAVECREDENTIALS 193
+
 
 /* Proxy Settings Dialog */
 #define IDD_PROXY			200
