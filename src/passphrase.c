@@ -158,7 +158,8 @@ void CheckAuthUsernamePrompt (char *line, int config)
   if (strncmp(line, "Enter Auth Username:", 20) == 0) 
     {
       CLEAR(user_auth);
-	  if (OPENVPN_ERROR_NOT_FOUND == ReadCredentials(o.cnn[config].config_name,&user_auth))
+	  /* check for credentials first */
+	  if (OPENVPN_ERROR_NOT_FOUND == ReadCredentials(config,&user_auth))
 	  {
 		  if (DialogBoxParam(o.hInstance, 
                          (LPCTSTR)IDD_CRED_PASSWORD,
@@ -215,7 +216,7 @@ void CheckAuthUsernamePrompt (char *line, int config)
             }
         }
 	  
-	  SaveCredentials(o.cnn[config].config_name, o.credentials_prefix_string, user_auth);
+	  //SaveCredentials(config,user_auth);
 
       /* Remove Username prompt from lastline buffer */
       line[0]='\0';
@@ -280,7 +281,7 @@ BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
   static char empty_string[100];
   WCHAR username_unicode[50];
   WCHAR password_unicode[50];
-  unsigned char savecred=0;
+  bool savecred=false;
 
   switch (msg) {
 

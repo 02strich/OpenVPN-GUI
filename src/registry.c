@@ -33,11 +33,10 @@ extern struct options o;
 int
 GetRegistryKeys()
 {
-  char windows_dir[MAX_PATH];
-  char temp_path[MAX_PATH];
-  char openvpn_path[MAX_PATH];
+  TCHAR windows_dir[MAX_PATH];
+  TCHAR temp_path[MAX_PATH];
+  TCHAR openvpn_path[MAX_PATH];
   HKEY regkey;
-  HKEY hkcu_regkey;
 
   if (!GetWindowsDirectory(windows_dir, sizeof(windows_dir))) {
     /* can't get windows dir */
@@ -45,24 +44,14 @@ GetRegistryKeys()
     return(false);
   }
 
-  /* Try Current User's OpenVPN settings first */
-  if (RegOpenKeyEx(HKEY_CURRENT_USER, OPENVPN_REGKEY, 0, KEY_READ, &regkey)
+   /* Get path to HKLM OpenVPN installation. */
+  if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, OPENVPN_REGKEY, 0, KEY_READ, &regkey)
       != ERROR_SUCCESS) 
     {
       /* registry key not found */
       ShowLocalizedMsg(GUI_NAME, ERR_OPEN_REGISTRY, "");
-     
+      return(false);
     }
-
-
-  /* Get path to HKLM OpenVPN installation. */
-  //if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, OPENVPN_REGKEY_HKLM, 0, KEY_READ, &regkey)
-   //   != ERROR_SUCCESS) 
-    //{
-      /* registry key not found */
-      //ShowLocalizedMsg(GUI_NAME, ERR_OPEN_REGISTRY, "");
-      //return(false);
-    //}
 
   if (!GetRegistryValue(regkey, "", openvpn_path, sizeof(openvpn_path)))
     {
@@ -73,8 +62,8 @@ GetRegistryKeys()
   if(openvpn_path[strlen(openvpn_path) - 1] != '\\')
     strcat(openvpn_path, "\\");
 
-
-  mysnprintf(temp_path, "%sconfig", openvpn_path);
+  /* OpenVPN-GUI Settings */
+  mysnprintf(temp_path, "%sconfig", openvpn_path); //"%APPDATA%\\OpenVPN\\"
   if (!GetRegKey("config_dir", o.config_dir, 
       temp_path, sizeof(o.config_dir))) return(false);
 
@@ -84,7 +73,7 @@ GetRegistryKeys()
   if (!GetRegKey("exe_path", o.exe_path, 
       temp_path, sizeof(o.exe_path))) return(false);
 
-  mysnprintf(temp_path, "%slog", openvpn_path);
+  mysnprintf(temp_path, "%slog", openvpn_path); //"%APPDATA%\\OpenVPN\\"
   if (!GetRegKey("log_dir", o.log_dir, 
       temp_path, sizeof(o.log_dir))) return(false);
 
@@ -159,10 +148,10 @@ GetRegistryKeys()
       ShowLocalizedMsg(GUI_NAME, ERR_PRECONN_SCRIPT_TIMEOUT, "");
       return(false);
     }
+
   if (!GetRegKey("credentials_prefix", o.credentials_prefix_string, "OpenVPN", 
       sizeof(o.credentials_prefix_string))) return(false);
-  //credentials_prefix[15]
-
+  
   return(true);
 }
 
@@ -172,6 +161,7 @@ int GetRegKey(const char name[], char *data, const char default_data[], DWORD le
   LONG status;
   DWORD type;
   HKEY openvpn_key;
+  HKEY openvpn_key_hkcu;
   HKEY openvpn_key_write;
   DWORD dwDispos;
   char expanded_string[MAX_PATH];
@@ -188,6 +178,13 @@ int GetRegKey(const char name[], char *data, const char default_data[], DWORD le
       strncpy(data, expanded_string, max_len);
       return(true);
     }
+
+  /* Check for user specific settings */
+  status = RegOpenCurrentUser(KEY_READ, &openvpn_key_hkcu);
+  if ( status != ERROR_SUCCESS )
+  {
+	  openvpn_key_hkcu = 0; // no user settings
+  }
 
   status = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
                        OPENVPNGUI_REGKEY,
@@ -213,11 +210,17 @@ int GetRegKey(const char name[], char *data, const char default_data[], DWORD le
         }  
     }
 
-
-  /* get a registry string */
-  status = RegQueryValueEx(openvpn_key, name, NULL, &type, (byte *) data, &len);
+  // overwrite with users setting if available 
+  /*if( (0 == strcmp(name,"config_dir")  || 0 == strcmp(name, "log_dir")) && openvpn_key_hkcu )
+  {  
+ 	status = RegGetValue(openvpn_key_hkcu, OPENVPNGUI_REGKEY, name , RRF_RT_ANY , &type, (byte *) data, &len);
+  }*/
+  // Check user settings first
+  if(ERROR_SUCCESS != (status = RegGetValue(openvpn_key_hkcu, OPENVPNGUI_REGKEY, name , RRF_RT_REG_SZ , &type, (byte *) data, &len)))
+    status = RegQueryValueEx(openvpn_key, name, NULL, &type, (byte *) data, &len); /* get a registry string */
+  
   if (status != ERROR_SUCCESS || type != REG_SZ)
-    {
+  {
       /* key did not exist - set default value */
       status = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
 			  OPENVPNGUI_REGKEY,
@@ -243,15 +246,30 @@ int GetRegKey(const char name[], char *data, const char default_data[], DWORD le
         }
       strncpy(data, default_data, max_len);
       RegCloseKey(openvpn_key_write);
+  }
 
-    }
-
+  
   RegCloseKey(openvpn_key);
 
   // Expand environment variables inside the string.
-  ExpandEnvironmentStrings(data, expanded_string, sizeof(expanded_string));
+  if(0 == ExpandEnvironmentStrings(data, expanded_string, sizeof(expanded_string)))
+  {
+	  ShowLocalizedMsg(GUI_NAME, ERR_BAD_OPTION, data);
+	  return(false);
+  }
   strncpy(data, expanded_string, max_len);
 
+  /* Check if Directory exits */
+  /*if( (0 == strcmp(name,"config_dir")  || 0 == strcmp(name, "log_dir")) && openvpn_key_hkcu )
+  {  
+	  int ret = SHCreateDirectoryEx(NULL,expanded_string,NULL);
+	  if(ret == ERROR_PATH_NOT_FOUND || ret == ERROR_BAD_PATHNAME)
+		  MessageBox(NULL,expanded_string,name,MB_OK);
+  }*/
+
+  if(openvpn_key_hkcu)
+	  RegCloseKey(openvpn_key_hkcu);
+ 
   return(true);
 }
 

@@ -42,9 +42,11 @@
 #define DEL_LOG_LINES		10	/* Number of lines to delete from LogWindow */
 
 /* bool definitions */
-#define bool int
-#define true 1
-#define false 0
+//#define bool int
+//#define true 1
+//#define false 0
+
+typedef enum { true=1, false=0} bool;
 
 #define PACKVERSION(major,minor) MAKELONG(minor,major)
 struct security_attributes
@@ -54,7 +56,7 @@ struct security_attributes
 };
 
 /* clear an object */
-#define CLEAR(x) memset(&(x), 0, sizeof(x))
+#define CLEAR(x) SecureZeroMemory(&(x),sizeof(x)) //memset(&(x), 0, sizeof(x))
 
 /* snprintf with guaranteed null termination */
 #define mysnprintf(out, ...) \
