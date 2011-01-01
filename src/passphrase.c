@@ -154,8 +154,6 @@ void CheckAuthUsernamePrompt (char *line, int config)
   DWORD nCharsWritten;
   struct user_auth user_auth;
 
-#pragma message ("Insert Password Save here")
-
   /* Check for Passphrase prompt */
   if (strncmp(line, "Enter Auth Username:", 20) == 0) 
     {
@@ -174,17 +172,6 @@ void CheckAuthUsernamePrompt (char *line, int config)
 		  }
 	  }
 
-#undef BLUB
-#ifdef BLUB
-      if (DialogBoxParam(o.hInstance, 
-                         (LPCTSTR)IDD_AUTH_PASSWORD,
-                         NULL,
-                         (DLGPROC)AuthPasswordDialogFunc,
-                         (LPARAM)&user_auth) == IDCANCEL)
-        {
-          StopOpenVPN(config);
-        }
-#endif
       if (strlen(user_auth.username) > 0)
         {
           if (!WriteFile(o.cnn[config].hStdIn, user_auth.username,
@@ -285,9 +272,9 @@ BOOL CALLBACK PassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARA
 BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   static struct user_auth *user_auth;
-  static char empty_string[100];
-  WCHAR username_unicode[50];
-  WCHAR password_unicode[50];
+  static TCHAR empty_string[50];
+  TCHAR username[50];
+  TCHAR password[50];
   
   switch (msg) {
 
@@ -300,15 +287,21 @@ BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
       switch (LOWORD(wParam)) {
 
         case IDOK:			// button
-          GetDlgItemTextW(hwndDlg, EDIT_CRED_USERNAME, username_unicode, sizeof(username_unicode)/2 - 1);
-          GetDlgItemTextW(hwndDlg, EDIT_CRED_PASSWORD, password_unicode, sizeof(password_unicode)/2 - 1);
+          GetDlgItemText(hwndDlg, EDIT_CRED_USERNAME, username, sizeof(username)/sizeof(TCHAR) - 1);
+          GetDlgItemText(hwndDlg, EDIT_CRED_PASSWORD, password, sizeof(password)/sizeof(TCHAR) - 1);
 
 		  save_cred = IsDlgButtonChecked(hwndDlg,IDC_CRED_SAVECREDENTIALS); //save password
 
+#ifdef _UNICODE
+		  WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,username,wcslen(username)+1,user_auth->username,sizeof(user_auth->username),NULL,NULL);
+		  WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,password,wcslen(password)+1,user_auth->password,sizeof(user_auth->password),NULL,NULL);
           /* Convert username/password from Unicode to Ascii (CP850) */
-          ConvertUnicode2Ascii(username_unicode, user_auth->username, sizeof(user_auth->username) - 1);
-          ConvertUnicode2Ascii(password_unicode, user_auth->password, sizeof(user_auth->password) - 1);
-
+     //     ConvertUnicode2Ascii(username, user_auth->username, sizeof(user_auth->username) - 1);
+     //     ConvertUnicode2Ascii(password, user_auth->password, sizeof(user_auth->password) - 1);
+#else
+		  strncpy(user_auth->username,username,strlen(username));
+		  strncpy(user_auth->password,password,strlen(password));
+#endif
           /* Clear buffers */
           SetDlgItemText(hwndDlg, EDIT_CRED_USERNAME, empty_string);
           SetDlgItemText(hwndDlg, EDIT_CRED_PASSWORD, empty_string);

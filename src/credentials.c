@@ -12,23 +12,26 @@ DWORD SaveCredentials(int config, struct user_auth user_auth)
 
 	ZeroMemory(&credentials,sizeof(CREDENTIAL));
 	
-	usrlen=_tcslen(user_auth.username); //unicode !!!
-	pwdlen=_tcslen(user_auth.password); //unicode !!!
+	usrlen=strlen(user_auth.username); //unicode !!!
+	pwdlen=strlen(user_auth.password); //Password remains ASCII
 	
 	
 	credentials.TargetName= (PTCHAR) malloc( (_tcslen(o.cnn[config].config_name) + _tcslen(o.credentials_prefix_string)+ 2) * sizeof(TCHAR) );
 	_stprintf(credentials.TargetName,TEXT("%s-%s"),o.credentials_prefix_string,o.cnn[config].config_name);
 
 	credentials.UserName = (PTCHAR) malloc( (usrlen+1) * sizeof(TCHAR) );
-	_tcsncpy(credentials.UserName, user_auth.username, usrlen+1);
+    _tcsncpy(credentials.UserName, user_auth.username, usrlen+1);
 
-	credentials.CredentialBlob=(LPBYTE)malloc(pwdlen*sizeof(TCHAR));
+	credentials.CredentialBlob=(LPBYTE)malloc(pwdlen*sizeof(CHAR));
 	if(NULL==credentials.CredentialBlob)
 		return -1;
-	
-	_tcsncpy((PTCHAR)credentials.CredentialBlob,user_auth.password,pwdlen);
 
-	credentials.CredentialBlobSize=pwdlen;
+	strncpy((PCHAR)credentials.CredentialBlob,user_auth.password,pwdlen);
+	// must be the same for unicode and non-unicode enviroments 
+	
+	//WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,,,,,NULL,NULL);
+
+	credentials.CredentialBlobSize = pwdlen;
 	credentials.Comment=TEXT("");
 	credentials.Persist = CRED_PERSIST_LOCAL_MACHINE; //preserve accross sessions; CRED_PERSIST_SESSION only for the current session
 	credentials.TargetAlias = 0; // If the credential Type is CRED_TYPE_GENERIC, this member can be non-NULL, but the credential manager ignores the member.
@@ -70,14 +73,24 @@ DWORD ReadCredentials(int config, struct user_auth *user_auth)
 		}
 
 	}
-	//MessageBox(NULL,buf,"1",MB_OK);
-#pragma message("check for valid data")
-	strncpy(user_auth->username,(PTCHAR)pcredential->UserName,_tcslen(pcredential->UserName));
-	strncpy(user_auth->password,(PTCHAR)pcredential->CredentialBlob,pcredential->CredentialBlobSize);
-	//MessageBox(NULL,"Read","2",MB_OK);
+	
+#ifdef _UNICODE
+	WideCharToMultiByte(CP_UTF8,
+		                WC_ERR_INVALID_CHARS,
+						(PWCHAR)pcredential->UserName,
+		                wcslen((PWCHAR)pcredential->UserName),
+		                user_auth->username,
+						sizeof(user_auth->username),
+						NULL,
+						NULL
+					   );
+#else
+	strncpy(user_auth->username,(PCHAR)pcredential->UserName,strlen(pcredential->UserName));
+#endif
+	strncpy(user_auth->password,(PCHAR)pcredential->CredentialBlob,pcredential->CredentialBlobSize);
+
 	SecureZeroMemory(pcredential->CredentialBlob, pcredential->CredentialBlobSize);
-	//MessageBox(NULL,"Read","3",MB_OK);
 	CredFree(pcredential); //free the buffer
-	//MessageBox(NULL,"Read","4",MB_OK);
+
 	return 0;
 }
