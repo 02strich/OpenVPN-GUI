@@ -1,5 +1,4 @@
-// Microsoft Visual C++ generated resource script.
-//
+
 #include "openvpn-gui-res.h"
 #include <windows.h>
 /////////////////////////////////////////////////////////////////////////////
@@ -456,6 +455,11 @@ BEGIN
     ERR_OPEN_WRITE_REG      "Failed to open the registry for writing. You need to run this application once as Administrator to update the registry."
     ERR_READ_SET_KEY        "Error reading and setting registry key ""%s""."
     ERR_WRITE_REGVALUE      "Error writing registry value ""HKEY_CURRENT_USER\\%s\\%s""."
+END
+
+STRINGTABLE
+BEGIN
+    ERR_SAVE_CREDENTIAL     "Error saving credential. "
 END
 
 #endif    // German (Germany) resources

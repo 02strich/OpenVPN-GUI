@@ -247,3 +247,5 @@
 #define ERR_READ_SET_KEY		1811
 #define ERR_WRITE_REGVALUE		1812
 
+/* credential */
+#define ERR_SAVE_CREDENTIAL		1901

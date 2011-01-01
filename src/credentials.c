@@ -9,7 +9,7 @@ DWORD SaveCredentials(int config, struct user_auth user_auth)
 	CREDENTIAL credentials;
 	int pwdlen=-1;
 	int usrlen=-1;
-	
+
 	ZeroMemory(&credentials,sizeof(CREDENTIAL));
 	
 	usrlen=_tcslen(user_auth.username); //unicode !!!
@@ -17,9 +17,6 @@ DWORD SaveCredentials(int config, struct user_auth user_auth)
 	
 	
 	credentials.TargetName= (PTCHAR) malloc( (_tcslen(o.cnn[config].config_name) + _tcslen(o.credentials_prefix_string)+ 2) * sizeof(TCHAR) );
-
-
-
 	_stprintf(credentials.TargetName,TEXT("%s-%s"),o.credentials_prefix_string,o.cnn[config].config_name);
 
 	credentials.UserName = (PTCHAR) malloc( (usrlen+1) * sizeof(TCHAR) );
@@ -37,24 +34,29 @@ DWORD SaveCredentials(int config, struct user_auth user_auth)
 	credentials.TargetAlias = 0; // If the credential Type is CRED_TYPE_GENERIC, this member can be non-NULL, but the credential manager ignores the member.
 	credentials.Type = CRED_TYPE_GENERIC;
 
-
 	if(TRUE!=CredWrite(&credentials,0))
-		MessageBox(NULL,TEXT("Fehler"),TEXT("CredWrite"),IDOK);
-	return 0;
+		return -1;
 
+	free(credentials.TargetName);
+	free(credentials.UserName);
+	free(credentials.CredentialBlob);
+
+	SecureZeroMemory(&credentials,sizeof(CREDENTIAL));
+
+	return 0;
 }
 
 DWORD ReadCredentials(int config, struct user_auth *user_auth)
 {
 	PCREDENTIAL pcredential;
 	PTCHAR buf;
-	//MessageBox(NULL,targetname,"",IDOK);
+	BOOL ret;
 
 	buf = (PTCHAR) malloc( (_tcslen(o.cnn[config].config_name) + _tcslen(o.credentials_prefix_string) + 2) * sizeof(TCHAR) );
 	_stprintf(buf,TEXT("%s-%s"),o.credentials_prefix_string,o.cnn[config].config_name);
 
-
-	if(TRUE!=CredRead(buf,CRED_TYPE_GENERIC,0,&pcredential))
+	
+	if(TRUE != CredRead(buf,CRED_TYPE_GENERIC,0,&pcredential))
 	{
 		DWORD ret=GetLastError();
 		switch(ret)
@@ -68,12 +70,14 @@ DWORD ReadCredentials(int config, struct user_auth *user_auth)
 		}
 
 	}
-
-	strncpy(user_auth->username,pcredential->UserName,strlen(pcredential->UserName));
+	//MessageBox(NULL,buf,"1",MB_OK);
+#pragma message("check for valid data")
+	strncpy(user_auth->username,(PTCHAR)pcredential->UserName,_tcslen(pcredential->UserName));
 	strncpy(user_auth->password,(PTCHAR)pcredential->CredentialBlob,pcredential->CredentialBlobSize);
-
+	//MessageBox(NULL,"Read","2",MB_OK);
 	SecureZeroMemory(pcredential->CredentialBlob, pcredential->CredentialBlobSize);
-
+	//MessageBox(NULL,"Read","3",MB_OK);
 	CredFree(pcredential); //free the buffer
+	//MessageBox(NULL,"Read","4",MB_OK);
 	return 0;
 }

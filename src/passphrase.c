@@ -147,6 +147,8 @@ void CheckPrivateKeyPassphrasePrompt (char *line, int config)
 
 }
 
+bool save_cred=false;
+
 void CheckAuthUsernamePrompt (char *line, int config)
 {
   DWORD nCharsWritten;
@@ -161,6 +163,7 @@ void CheckAuthUsernamePrompt (char *line, int config)
 	  /* check for credentials first */
 	  if (OPENVPN_ERROR_NOT_FOUND == ReadCredentials(config,&user_auth))
 	  {
+		  save_cred=false;
 		  if (DialogBoxParam(o.hInstance, 
                          (LPCTSTR)IDD_CRED_PASSWORD,
                          NULL,
@@ -216,7 +219,11 @@ void CheckAuthUsernamePrompt (char *line, int config)
             }
         }
 	  
-	  //SaveCredentials(config,user_auth);
+	  if(save_cred)
+	  {
+		if(0!=SaveCredentials(config,user_auth))
+			ShowLocalizedMsg(GUI_NAME, ERR_SAVE_CREDENTIAL, "");
+	  }
 
       /* Remove Username prompt from lastline buffer */
       line[0]='\0';
@@ -281,8 +288,7 @@ BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
   static char empty_string[100];
   WCHAR username_unicode[50];
   WCHAR password_unicode[50];
-  bool savecred=false;
-
+  
   switch (msg) {
 
     case WM_INITDIALOG:
@@ -297,12 +303,7 @@ BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
           GetDlgItemTextW(hwndDlg, EDIT_CRED_USERNAME, username_unicode, sizeof(username_unicode)/2 - 1);
           GetDlgItemTextW(hwndDlg, EDIT_CRED_PASSWORD, password_unicode, sizeof(password_unicode)/2 - 1);
 
-		  savecred = IsDlgButtonChecked(hwndDlg,IDC_CRED_SAVECREDENTIALS); //save password
-		  
-		  if(savecred)
-			  MessageBox(NULL,"Checked","",IDOK);
-
-
+		  save_cred = IsDlgButtonChecked(hwndDlg,IDC_CRED_SAVECREDENTIALS); //save password
 
           /* Convert username/password from Unicode to Ascii (CP850) */
           ConvertUnicode2Ascii(username_unicode, user_auth->username, sizeof(user_auth->username) - 1);
