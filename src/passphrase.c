@@ -159,13 +159,13 @@ void CheckAuthUsernamePrompt (char *line, int config)
     {
       CLEAR(user_auth);
 	  /* check for credentials first */
-	  if (OPENVPN_ERROR_NOT_FOUND == ReadCredentials(config,&user_auth))
+	  if (0 != ReadCredentials(config,&user_auth))
 	  {
 		  save_cred=false;
 		  if (DialogBoxParam(o.hInstance, 
-                         (LPCTSTR)IDD_CRED_PASSWORD,
+                         (LPCTSTR)IDD_AUTH_PASSWORD,
                          NULL,
-                         (DLGPROC)CredPasswordDialogFunc,
+                         (DLGPROC)AuthPasswordDialogFunc,
                          (LPARAM)&user_auth) == IDCANCEL)
 		  {
 			StopOpenVPN(config);
@@ -269,7 +269,7 @@ BOOL CALLBACK PassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARA
   return FALSE;
 }
 
-BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK AuthPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   static struct user_auth *user_auth;
   static TCHAR empty_string[50];
@@ -287,10 +287,10 @@ BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
       switch (LOWORD(wParam)) {
 
         case IDOK:			// button
-          GetDlgItemText(hwndDlg, EDIT_CRED_USERNAME, username, sizeof(username)/sizeof(TCHAR) - 1);
-          GetDlgItemText(hwndDlg, EDIT_CRED_PASSWORD, password, sizeof(password)/sizeof(TCHAR) - 1);
+          GetDlgItemText(hwndDlg, EDIT_AUTH_USERNAME, username, sizeof(username)/sizeof(TCHAR) - 1);
+          GetDlgItemText(hwndDlg, EDIT_AUTH_PASSWORD, password, sizeof(password)/sizeof(TCHAR) - 1);
 
-		  save_cred = IsDlgButtonChecked(hwndDlg,IDC_CRED_SAVECREDENTIALS); //save password
+		  save_cred = IsDlgButtonChecked(hwndDlg,IDC_AUTH_SAVECREDENTIALS); //save password
 
 #ifdef _UNICODE
 		  WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,username,wcslen(username)+1,user_auth->username,sizeof(user_auth->username),NULL,NULL);
@@ -302,52 +302,6 @@ BOOL CALLBACK CredPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
 		  strncpy(user_auth->username,username,strlen(username));
 		  strncpy(user_auth->password,password,strlen(password));
 #endif
-          /* Clear buffers */
-          SetDlgItemText(hwndDlg, EDIT_CRED_USERNAME, empty_string);
-          SetDlgItemText(hwndDlg, EDIT_CRED_PASSWORD, empty_string);
-
-          EndDialog(hwndDlg, LOWORD(wParam));
-          return TRUE;
-
-        case IDCANCEL:			// button
-          EndDialog(hwndDlg, LOWORD(wParam));
-          return TRUE;
-      }
-      break;
-    case WM_CLOSE:
-      EndDialog(hwndDlg, LOWORD(wParam));
-      return TRUE;
-     
-  }
-  return FALSE;
-}
-
-
-BOOL CALLBACK AuthPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  static struct user_auth *user_auth;
-  static char empty_string[100];
-  WCHAR username_unicode[50];
-  WCHAR password_unicode[50];
-
-  switch (msg) {
-
-    case WM_INITDIALOG:
-      user_auth = (struct user_auth *) lParam;
-      SetForegroundWindow(hwndDlg);
-      break;
-
-    case WM_COMMAND:
-      switch (LOWORD(wParam)) {
-
-        case IDOK:			// button
-          GetDlgItemTextW(hwndDlg, EDIT_AUTH_USERNAME, username_unicode, sizeof(username_unicode)/2 - 1);
-          GetDlgItemTextW(hwndDlg, EDIT_AUTH_PASSWORD, password_unicode, sizeof(password_unicode)/2 - 1);
-
-          /* Convert username/password from Unicode to Ascii (CP850) */
-          ConvertUnicode2Ascii(username_unicode, user_auth->username, sizeof(user_auth->username) - 1);
-          ConvertUnicode2Ascii(password_unicode, user_auth->password, sizeof(user_auth->password) - 1);
-
           /* Clear buffers */
           SetDlgItemText(hwndDlg, EDIT_AUTH_USERNAME, empty_string);
           SetDlgItemText(hwndDlg, EDIT_AUTH_PASSWORD, empty_string);

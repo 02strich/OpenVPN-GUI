@@ -59,11 +59,9 @@
 #define	IDD_AUTH_PASSWORD		180
 #define	EDIT_AUTH_USERNAME		181
 #define	EDIT_AUTH_PASSWORD		182
-/* Cred Auth Username/Password Dialog */
-#define	IDD_CRED_PASSWORD		190
-#define	EDIT_CRED_USERNAME		191
+#define IDC_AUTH_SAVECREDENTIALS 183
 #define	EDIT_CRED_PASSWORD		192
-#define IDC_CRED_SAVECREDENTIALS 193
+
 
 
 /* Proxy Settings Dialog */
