@@ -37,6 +37,7 @@
 WCHAR passphrase[256];
 extern struct options o;
 
+
 int ConvertUnicode2Ascii(WCHAR str_unicode[], char str_ascii[], unsigned int str_ascii_size)
 {
   unsigned int i;
@@ -83,7 +84,7 @@ void CheckPrivateKeyPassphrasePrompt (char *line, int config)
       if (wcslen(passphrase) > 0)
         {
           CLEAR(passphrase_ascii);
-          ConvertUnicode2Ascii(passphrase, passphrase_ascii, sizeof(passphrase_ascii));
+		  WideCharToMultiByte(CP_850,WC_ERR_INVALID_CHARS,passphrase,sizeof(passphrase)/sizeof(WCHAR),passphrase_ascii,sizeof(passphrase_ascii),NULL,NULL);
 
           if (!WriteFile(o.cnn[config].hStdIn, passphrase_ascii,
                     strlen(passphrase_ascii), &nCharsWritten, NULL))
@@ -119,7 +120,7 @@ void CheckPrivateKeyPassphrasePrompt (char *line, int config)
       if (wcslen(passphrase) > 0)
         {
           CLEAR(passphrase_ascii);
-          ConvertUnicode2Ascii(passphrase, passphrase_ascii, sizeof(passphrase_ascii));
+          WideCharToMultiByte(CP_850,WC_ERR_INVALID_CHARS,passphrase,sizeof(passphrase)/sizeof(WCHAR),passphrase_ascii,sizeof(passphrase_ascii),NULL,NULL);
 
           if (!WriteFile(o.cnn[config].hStdIn, passphrase_ascii,
                     strlen(passphrase_ascii), &nCharsWritten, NULL))
@@ -210,6 +211,7 @@ void CheckAuthUsernamePrompt (char *line, int config)
 	  {
 		if(0!=SaveCredentials(config,user_auth))
 			ShowLocalizedMsg(GUI_NAME, ERR_SAVE_CREDENTIAL, "");
+		save_cred=false;
 	  }
 
       /* Remove Username prompt from lastline buffer */
@@ -272,9 +274,9 @@ BOOL CALLBACK PassphraseDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARA
 BOOL CALLBACK AuthPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   static struct user_auth *user_auth;
-  static TCHAR empty_string[50];
-  TCHAR username[50];
-  TCHAR password[50];
+  static WCHAR empty_string[50];
+  WCHAR username[50];
+  WCHAR password[50];
   
   switch (msg) {
 
@@ -287,24 +289,20 @@ BOOL CALLBACK AuthPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
       switch (LOWORD(wParam)) {
 
         case IDOK:			// button
-          GetDlgItemText(hwndDlg, EDIT_AUTH_USERNAME, username, sizeof(username)/sizeof(TCHAR) - 1);
-          GetDlgItemText(hwndDlg, EDIT_AUTH_PASSWORD, password, sizeof(password)/sizeof(TCHAR) - 1);
+          GetDlgItemTextW(hwndDlg, EDIT_AUTH_USERNAME, username, sizeof(username)/sizeof(WCHAR) - 1);
+          GetDlgItemTextW(hwndDlg, EDIT_AUTH_PASSWORD, password, sizeof(password)/sizeof(WCHAR) - 1);
 
 		  save_cred = IsDlgButtonChecked(hwndDlg,IDC_AUTH_SAVECREDENTIALS); //save password
-
-#ifdef _UNICODE
-		  WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,username,wcslen(username)+1,user_auth->username,sizeof(user_auth->username),NULL,NULL);
-		  WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,password,wcslen(password)+1,user_auth->password,sizeof(user_auth->password),NULL,NULL);
-          /* Convert username/password from Unicode to Ascii (CP850) */
-     //     ConvertUnicode2Ascii(username, user_auth->username, sizeof(user_auth->username) - 1);
-     //     ConvertUnicode2Ascii(password, user_auth->password, sizeof(user_auth->password) - 1);
-#else
-		  strncpy(user_auth->username,username,strlen(username));
-		  strncpy(user_auth->password,password,strlen(password));
-#endif
-          /* Clear buffers */
-          SetDlgItemText(hwndDlg, EDIT_AUTH_USERNAME, empty_string);
-          SetDlgItemText(hwndDlg, EDIT_AUTH_PASSWORD, empty_string);
+		  
+		  //WideCharToMultiByte(CP_850,WC_ERR_INVALID_CHARS,(PWCHAR)credentials.CredentialBlob,credentials.CredentialBlobSize,user_auth.password,strlen(user_auth.password),NULL,NULL);
+		  //WideCharToMultiByte(CP_850,WC_ERR_INVALID_CHARS,(PWCHAR)credentials.CredentialBlob,credentials.CredentialBlobSize,user_auth.password,strlen(user_auth.password),NULL,NULL);
+		  /* Convert username/password from Unicode to Ascii (CP850) */
+          ConvertUnicode2Ascii(username, user_auth->username, sizeof(user_auth->username) - 1);
+          ConvertUnicode2Ascii(password, user_auth->password, sizeof(user_auth->password) - 1);
+		  MessageBox(NULL,user_auth->password,"",MB_OK);  
+		  /* Clear buffers */
+          SetDlgItemTextW(hwndDlg, EDIT_AUTH_USERNAME, empty_string);
+          SetDlgItemTextW(hwndDlg, EDIT_AUTH_PASSWORD, empty_string);
 
           EndDialog(hwndDlg, LOWORD(wParam));
           return TRUE;
@@ -661,7 +659,7 @@ int ChangePasswordPEM(HWND hwndDlg)
   GetDlgItemTextW(hwndDlg, EDIT_PSW_NEW, newpsw_unicode, sizeof(newpsw_unicode)/2 - 1); 
 
   /* Convert Unicode to ASCII (CP850) */
-  ConvertUnicode2Ascii(oldpsw_unicode, oldpsw, sizeof(oldpsw));
+  ConvertUnicode2Ascii(oldpsw_unicode,oldpsw,sizeof(oldpsw));
   if (!ConvertUnicode2Ascii(newpsw_unicode, newpsw, sizeof(newpsw)))
     {
       ShowLocalizedMsg(GUI_NAME, ERR_INVALID_CHARS_IN_PSW, "");

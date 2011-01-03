@@ -18,7 +18,7 @@
  *  distribution); if not, write to the Free Software Foundation, Inc.,
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
+#include <tchar.h>
 #include <stdio.h>
 
 /* Define this to enable DEBUG build */
@@ -29,7 +29,7 @@
 //#define DISABLE_CHANGE_PASSWORD
 
 #define GUI_NAME	"OpenVPN GUI"
-#define GUI_VERSION	"1.0.3"
+#define GUI_VERSION	"1.0.4"
 
 /* Registry key for User Settings */
 #define GUI_REGKEY_HKCU	"Software\\Nilings\\OpenVPN-GUI"
@@ -56,7 +56,7 @@ struct security_attributes
 };
 
 /* clear an object */
-#define CLEAR(x) SecureZeroMemory(&(x),sizeof(x)) //memset(&(x), 0, sizeof(x))
+#define CLEAR(x) memset(&(x), 0, sizeof(x))
 
 /* snprintf with guaranteed null termination */
 #define mysnprintf(out, ...) \

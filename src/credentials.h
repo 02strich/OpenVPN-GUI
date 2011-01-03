@@ -6,6 +6,7 @@
 #include "passphrase.h"
 #include "options.h"
 
+#define CP_850 850
 
 #define OPENVPN_ERROR_NOT_FOUND ERROR_NOT_FOUND
 #define OPENVPN_ERROR_NO_SUCH_LOGON_SESSION ERROR_NO_SUCH_LOGON_SESSION 

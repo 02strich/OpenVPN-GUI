@@ -19,9 +19,9 @@
  *  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#define OPENVPN_REGKEY TEXT("SOFTWARE\\OpenVPN")
+#define OPENVPN_REGKEY "SOFTWARE\\OpenVPN"
 
-#define OPENVPNGUI_REGKEY TEXT("SOFTWARE\\OpenVPN-GUI")
+#define OPENVPNGUI_REGKEY "SOFTWARE\\OpenVPN-GUI"
 
 
 int GetRegistryKeys();

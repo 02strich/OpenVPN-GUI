@@ -6,60 +6,63 @@ extern struct options o;
 
 DWORD SaveCredentials(int config, struct user_auth user_auth)
 {
-	CREDENTIAL credentials;
+	CREDENTIALA credentials;
 	int pwdlen=-1;
 	int usrlen=-1;
 
-	ZeroMemory(&credentials,sizeof(CREDENTIAL));
+	ZeroMemory(&credentials,sizeof(CREDENTIALA));
 	
 	usrlen=strlen(user_auth.username); //unicode !!!
-	pwdlen=strlen(user_auth.password); //Password remains ASCII
+	pwdlen=strlen(user_auth.password); //Password Unicode because Windows UI saved Unicode in W7
 	
 	
-	credentials.TargetName= (PTCHAR) malloc( (_tcslen(o.cnn[config].config_name) + _tcslen(o.credentials_prefix_string)+ 2) * sizeof(TCHAR) );
-	_stprintf(credentials.TargetName,TEXT("%s-%s"),o.credentials_prefix_string,o.cnn[config].config_name);
+	credentials.TargetName= (char*) malloc( (strlen(o.cnn[config].config_name) + strlen(o.credentials_prefix_string)+ 2) * sizeof(char) );
+	sprintf(credentials.TargetName,"%s-%s",o.credentials_prefix_string,o.cnn[config].config_name);
 
-	credentials.UserName = (PTCHAR) malloc( (usrlen+1) * sizeof(TCHAR) );
-    _tcsncpy(credentials.UserName, user_auth.username, usrlen+1);
-
-	credentials.CredentialBlob=(LPBYTE)malloc(pwdlen*sizeof(CHAR));
+	credentials.UserName = (char*) malloc( (usrlen+1) * sizeof(char));
+    strncpy(credentials.UserName, user_auth.username, usrlen+1);
+	/* Password has to be UNICODE to be compatible with Windows UI changes */
+	credentials.CredentialBlob=(LPBYTE)malloc(pwdlen*sizeof(WCHAR));
 	if(NULL==credentials.CredentialBlob)
 		return -1;
 
-	strncpy((PCHAR)credentials.CredentialBlob,user_auth.password,pwdlen);
+	credentials.CredentialBlobSize = pwdlen * sizeof(WCHAR);
+#pragma message("Error Handling")
+	MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,user_auth.password,strlen(user_auth.password),(PWCHAR)credentials.CredentialBlob,credentials.CredentialBlobSize);
+	//strncpy((PCHAR)credentials.CredentialBlob,user_auth.password,pwdlen);
 	// must be the same for unicode and non-unicode enviroments 
 	
 	//WideCharToMultiByte(CP_UTF8,WC_ERR_INVALID_CHARS,,,,,NULL,NULL);
 
-	credentials.CredentialBlobSize = pwdlen;
-	credentials.Comment=TEXT("");
-	credentials.Persist = CRED_PERSIST_LOCAL_MACHINE; //preserve accross sessions; CRED_PERSIST_SESSION only for the current session
+	credentials.Comment="";
+	credentials.Persist = CRED_PERSIST_ENTERPRISE; //preserve accross sessions; CRED_PERSIST_SESSION only for the current session
 	credentials.TargetAlias = 0; // If the credential Type is CRED_TYPE_GENERIC, this member can be non-NULL, but the credential manager ignores the member.
 	credentials.Type = CRED_TYPE_GENERIC;
 
-	if(TRUE!=CredWrite(&credentials,0))
+	if(TRUE!=CredWriteA(&credentials,0))
 		return -1;
 
 	free(credentials.TargetName);
 	free(credentials.UserName);
 	free(credentials.CredentialBlob);
 
-	SecureZeroMemory(&credentials,sizeof(CREDENTIAL));
+	SecureZeroMemory(&credentials,sizeof(CREDENTIALA));
 
 	return 0;
 }
 
+
 DWORD ReadCredentials(int config, struct user_auth *user_auth)
 {
-	PCREDENTIAL pcredential;
-	PTCHAR buf;
+	PCREDENTIALA pcredential;
+	char *buf;
 	BOOL ret;
 
-	buf = (PTCHAR) malloc( (_tcslen(o.cnn[config].config_name) + _tcslen(o.credentials_prefix_string) + 2) * sizeof(TCHAR) );
-	_stprintf(buf,TEXT("%s-%s"),o.credentials_prefix_string,o.cnn[config].config_name);
+	buf = (char*) malloc( (strlen(o.cnn[config].config_name) + strlen(o.credentials_prefix_string) + 2) * sizeof(char) );
+	sprintf(buf,"%s-%s",o.credentials_prefix_string,o.cnn[config].config_name);
 
 	
-	if(TRUE != CredRead(buf,CRED_TYPE_GENERIC,0,&pcredential))
+	if(TRUE != CredReadA(buf,CRED_TYPE_GENERIC,0,&pcredential))
 	{
 		DWORD ret=GetLastError();
 		switch(ret)
@@ -74,21 +77,19 @@ DWORD ReadCredentials(int config, struct user_auth *user_auth)
 
 	}
 	
-#ifdef _UNICODE
+	strncpy(user_auth->username,(PCHAR)pcredential->UserName,strlen(pcredential->UserName));
+	
+    /* Password is always UNICODE, to be compatibl with Windows UI */ 
 	WideCharToMultiByte(CP_UTF8,
 		                WC_ERR_INVALID_CHARS,
-						(PWCHAR)pcredential->UserName,
-		                wcslen((PWCHAR)pcredential->UserName),
-		                user_auth->username,
-						sizeof(user_auth->username),
+						(PWCHAR)pcredential->CredentialBlob,
+						pcredential->CredentialBlobSize/sizeof(WCHAR),
+						user_auth->password,
+						sizeof(user_auth->password),
 						NULL,
 						NULL
 					   );
-#else
-	strncpy(user_auth->username,(PCHAR)pcredential->UserName,strlen(pcredential->UserName));
-#endif
-	strncpy(user_auth->password,(PCHAR)pcredential->CredentialBlob,pcredential->CredentialBlobSize);
-
+	
 	SecureZeroMemory(pcredential->CredentialBlob, pcredential->CredentialBlobSize);
 	CredFree(pcredential); //free the buffer
 
