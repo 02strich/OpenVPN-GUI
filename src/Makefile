@@ -29,13 +29,13 @@ OBJS = main.obj \
 	openvpn.obj \
 	openvpn_monitor_process.obj \
 	viewlog.obj \
-        service.obj \
+    service.obj \
 	options.obj \
 	passphrase.obj \
 	proxy.obj \
 	ieproxy.obj \
 	registry.obj \
-        openvpn_config.obj \
+	openvpn_config.obj \
 	scripts.obj \
 	credentials.obj \
 	openvpn-gui-$(RES_LANG).res
