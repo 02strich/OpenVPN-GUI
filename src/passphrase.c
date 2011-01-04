@@ -299,7 +299,6 @@ BOOL CALLBACK AuthPasswordDialogFunc (HWND hwndDlg, UINT msg, WPARAM wParam, LPA
 		  /* Convert username/password from Unicode to Ascii (CP850) */
           ConvertUnicode2Ascii(username, user_auth->username, sizeof(user_auth->username) - 1);
           ConvertUnicode2Ascii(password, user_auth->password, sizeof(user_auth->password) - 1);
-		  MessageBox(NULL,user_auth->password,"",MB_OK);  
 		  /* Clear buffers */
           SetDlgItemTextW(hwndDlg, EDIT_AUTH_USERNAME, empty_string);
           SetDlgItemTextW(hwndDlg, EDIT_AUTH_PASSWORD, empty_string);
