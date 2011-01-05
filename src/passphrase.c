@@ -84,7 +84,7 @@ void CheckPrivateKeyPassphrasePrompt (char *line, int config)
       if (wcslen(passphrase) > 0)
         {
           CLEAR(passphrase_ascii);
-		  WideCharToMultiByte(CP_850,WC_ERR_INVALID_CHARS,passphrase,sizeof(passphrase)/sizeof(WCHAR),passphrase_ascii,sizeof(passphrase_ascii),NULL,NULL);
+		  ConvertUnicode2Ascii(passphrase, passphrase_ascii, sizeof(passphrase_ascii));
 
           if (!WriteFile(o.cnn[config].hStdIn, passphrase_ascii,
                     strlen(passphrase_ascii), &nCharsWritten, NULL))
@@ -120,7 +120,7 @@ void CheckPrivateKeyPassphrasePrompt (char *line, int config)
       if (wcslen(passphrase) > 0)
         {
           CLEAR(passphrase_ascii);
-          WideCharToMultiByte(CP_850,WC_ERR_INVALID_CHARS,passphrase,sizeof(passphrase)/sizeof(WCHAR),passphrase_ascii,sizeof(passphrase_ascii),NULL,NULL);
+		  ConvertUnicode2Ascii(passphrase, passphrase_ascii, sizeof(passphrase_ascii));
 
           if (!WriteFile(o.cnn[config].hStdIn, passphrase_ascii,
                     strlen(passphrase_ascii), &nCharsWritten, NULL))

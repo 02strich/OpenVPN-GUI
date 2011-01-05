@@ -41,7 +41,7 @@ OBJS = main.obj \
 	openvpn-gui-$(RES_LANG).res
 
 INCLUDE_DIRS = -I. 
-LIB_DIRS = /NODEFAULTLIB:libcmt /DEFAULTLIB:msvcrt /DEFAULTLIB:user32 /DEFAULTLIB:Advapi32 /DEFAULTLIB:WinInet /DEFAULTLIB:shell32
+LIB_DIRS = /DEFAULTLIB:libcmt /DEFAULTLIB:user32 /DEFAULTLIB:Advapi32 /DEFAULTLIB:WinInet /DEFAULTLIB:shell32
 
 WARNS = -W -Wall -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast \
 	-Wcast-align -Wwrite-strings -Wconversion -Wsign-compare \
